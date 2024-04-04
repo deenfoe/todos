@@ -136,7 +136,7 @@ export default class App extends Component {
     })
   }
 
-  12render() {
+  render() {
     const { tasks, filter, currentTime } = this.state
     const visibleTasks = this.filterTasks(filter, tasks)
     const doneCount = tasks.filter((task) => task.completed).length
