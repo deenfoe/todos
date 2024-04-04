@@ -85,7 +85,7 @@ export default class Task extends Component {
               <span className="created">{timeAgo}</span>
             </label>
           )}
-
+          {console.log(completed)}
           {!isEditing && (
             <>
               <button className="icon icon-edit" onClick={this.toggleEdit} />
