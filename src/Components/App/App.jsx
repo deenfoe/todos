@@ -11,11 +11,7 @@ export default class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      tasks: [
-        this.createTodoItem('Купить молоко'),
-        this.createTodoItem('Выгулять собаку'),
-        this.createTodoItem('Помыть посуду'),
-      ],
+      tasks: [],
       filter: 'all',
       currentTime: new Date(),
     }
