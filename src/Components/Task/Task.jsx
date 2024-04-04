@@ -33,6 +33,14 @@ export default class Task extends Component {
     }
   }
 
+  handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      this.saveTask(event.target.value)
+    } else if (event.key === 'Escape') {
+      this.toggleEdit()
+    }
+  }
+
   onItemClick = () => {
     const { onToggleLeft, id } = this.props
     onToggleLeft(id)
@@ -73,11 +81,7 @@ export default class Task extends Component {
               autoFocus
               type="text"
               defaultValue={description}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  this.saveTask(event.target.value)
-                }
-              }}
+              onKeyDown={this.handleKeyDown}
             />
           ) : (
             <label onClick={onToggleLeft}>
