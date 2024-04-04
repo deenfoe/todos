@@ -16,7 +16,7 @@ export default class Task extends Component {
     if (secondsAgo < 20) {
       return 'меньше 20 секунд назад'
     }
-    if (secondsAgo < 40) {
+    if (secondsAgo < 30) {
       return 'меньше 30 секунд назад'
     }
     if (secondsAgo < 60) {
