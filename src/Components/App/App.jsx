@@ -6,7 +6,7 @@ import TaskList from '../TaskList'
 import Footer from '../Footer'
 
 export default class App extends Component {
-  maxId = 4
+  maxId = 1
 
   constructor(props) {
     super(props)
