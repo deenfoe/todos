@@ -11,7 +11,7 @@ module.exports = {
     'plugin:import/warnings',
     'plugin:prettier/recommended',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs'],
+  ignorePatterns: ['dist', '.eslintrc.cjs', './index.js'],
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
@@ -28,7 +28,7 @@ module.exports = {
     'jsx-a11y/click-events-have-key-events': 0,
     'react/jsx-no-target-blank': 'off',
     'react/react-in-jsx-scope': 'off',
-    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx', '.tsx'] }],
+    'react/jsx-filename-extension': [0, { extensions: ['.js', '.jsx', '.tsx'] }],
     'react/prop-types': 0,
     'react/button-has-type': 0,
     'prettier/prettier': 'error',
@@ -40,9 +40,6 @@ module.exports = {
         'newlines-between': 'always',
       },
     ],
-  },
-  globals: {
-    __dirname: 'readonly',
   },
   settings: {
     'import/resolver': {
