@@ -138,4 +138,12 @@ Task.propTypes = {
   onToggleLeft: PropTypes.func.isRequired,
   onSaveTaskDescription: PropTypes.func.isRequired,
   completed: PropTypes.bool.isRequired,
+  startTimer: PropTypes.func.isRequired,
+  pauseTimer: PropTypes.func.isRequired,
+  timers: PropTypes.objectOf(
+    PropTypes.shape({
+      timerId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      remainingTime: PropTypes.number,
+    })
+  ).isRequired,
 }

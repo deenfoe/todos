@@ -29,7 +29,6 @@ module.exports = {
     'react/jsx-no-target-blank': 'off',
     'react/react-in-jsx-scope': 'off',
     'react/jsx-filename-extension': [0, { extensions: ['.js', '.jsx', '.tsx'] }],
-    'react/prop-types': 0,
     'react/button-has-type': 0,
     'prettier/prettier': 'error',
     'linebreak-style': [0, 'unix'],

@@ -52,4 +52,12 @@ TaskList.propTypes = {
   onDeleted: PropTypes.func,
   onToggleLeft: PropTypes.func,
   onSaveTaskDescription: PropTypes.func,
+  startTimer: PropTypes.func.isRequired,
+  pauseTimer: PropTypes.func.isRequired,
+  timers: PropTypes.objectOf(
+    PropTypes.shape({
+      remainingTime: PropTypes.number,
+      timerId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    })
+  ).isRequired,
 }
