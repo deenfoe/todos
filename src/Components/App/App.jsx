@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
 import './App.css'
 import Header from '../Header'
@@ -6,14 +7,13 @@ import TaskList from '../TaskList'
 import Footer from '../Footer'
 
 export default class App extends Component {
-  maxId = 1
-
   constructor(props) {
     super(props)
     this.state = {
       tasks: [],
       filter: 'all',
       currentTime: new Date(),
+      timers: {},
     }
   }
 
@@ -22,22 +22,60 @@ export default class App extends Component {
   }
 
   componentWillUnmount() {
+    // Очистка интервала, используя this.timerID
     clearInterval(this.timerID)
+    const { timers } = this.state
+    // Перебор всех таймеров и их очистка
+    Object.values(timers).forEach((timer) => {
+      if (timer.timerId) clearInterval(timer.timerId)
+    })
   }
 
-  addItem = (text) => {
-    const trimmedText = text.trim()
-    if (!trimmedText) {
-      // Если текст пуст после обрезки, не добавляем его как новое задание.
-      return
+  startTimer = (taskId) => {
+    const timer = setInterval(() => {
+      this.setState(({ timers }) => {
+        const newTimers = { ...timers }
+        if (newTimers[taskId].remainingTime > 0) {
+          newTimers[taskId].remainingTime -= 1
+        } else {
+          clearInterval(newTimers[taskId].timerId)
+          newTimers[taskId].timerId = null
+        }
+        return { timers: newTimers }
+      })
+    }, 1000)
+
+    this.setState(({ timers }) => ({
+      timers: { ...timers, [taskId]: { ...timers[taskId], timerId: timer } },
+    }))
+  }
+
+  pauseTimer = (taskId) => {
+    this.setState(({ timers }) => {
+      const newTimers = { ...timers }
+      if (newTimers[taskId].timerId) {
+        clearInterval(newTimers[taskId].timerId)
+        newTimers[taskId].timerId = null
+      }
+      return { timers: newTimers }
+    })
+  }
+
+  addItem = (data) => {
+    const newTask = {
+      id: uuidv4(),
+      description: data.description,
+      timer: Number(data.minutes) * 60 + Number(data.seconds),
+      created: new Date(),
+      completed: false,
     }
 
-    const newItem = this.createTodoItem(text)
-
-    this.setState(({ tasks }) => {
-      const newTasks = [...tasks, newItem]
+    this.setState(({ tasks, timers }) => {
+      const newTasks = [...tasks, newTask]
+      const newTimers = { ...timers, [newTask.id]: { remainingTime: newTask.timer, timerId: null } }
       return {
         tasks: newTasks,
+        timers: newTimers,
       }
     })
   }
@@ -57,14 +95,27 @@ export default class App extends Component {
   }
 
   toggleLeft = (id) => {
-    this.setState(({ tasks }) => {
+    this.setState(({ tasks, timers }) => {
       const index = tasks.findIndex((task) => task.id === id)
+      const oldTask = tasks[index]
+      const newTask = { ...oldTask, completed: !oldTask.completed }
+      const newTasks = [...tasks.slice(0, index), newTask, ...tasks.slice(index + 1)]
 
-      const oldItem = tasks[index]
-      const newItem = { ...oldItem, completed: !oldItem.completed }
-      const newTasks = [...tasks.slice(0, index), newItem, ...tasks.slice(index + 1)]
+      // Создаем новый объект для timers
+      const newTimers = { ...timers }
+      if (newTask.completed) {
+        // Если задача завершена, сбрасываем таймер
+        if (newTimers[id].timerId) {
+          // Если таймер запущен, останавливаем его
+          clearInterval(newTimers[id].timerId)
+        }
+        // Сбрасываем оставшееся время до нуля
+        newTimers[id] = { ...newTimers[id], remainingTime: 0, timerId: null }
+      }
+
       return {
         tasks: newTasks,
+        timers: newTimers,
       }
     })
   }
@@ -75,10 +126,8 @@ export default class App extends Component {
         tasks: tasks.map((task) => {
           if (task.id === id) {
             return {
-              id: task.id,
-              description: newDescription, // Новое описание
-              created: task.created,
-              completed: task.completed,
+              ...task,
+              description: newDescription,
             }
           }
           return task
@@ -114,18 +163,6 @@ export default class App extends Component {
     })
   }
 
-  createTodoItem(description) {
-    const newId = this.maxId + 1
-    this.maxId = newId
-
-    return {
-      description,
-      created: new Date(),
-      completed: false,
-      id: newId,
-    }
-  }
-
   tick() {
     this.setState({
       currentTime: new Date(),
@@ -133,7 +170,7 @@ export default class App extends Component {
   }
 
   render() {
-    const { tasks, filter, currentTime } = this.state
+    const { tasks, filter, currentTime, timers } = this.state
     const visibleTasks = this.filterTasks(filter, tasks)
     const doneCount = tasks.filter((task) => task.completed).length
     const todoCount = tasks.length - doneCount
@@ -148,6 +185,9 @@ export default class App extends Component {
             onDeleted={this.deleteItem}
             onToggleLeft={this.toggleLeft}
             onSaveTaskDescription={this.saveTaskDescription}
+            startTimer={this.startTimer}
+            pauseTimer={this.pauseTimer}
+            timers={timers}
           />
 
           <Footer

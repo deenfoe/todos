@@ -22,8 +22,16 @@ export default class Task extends Component {
     if (secondsAgo < 60) {
       return 'меньше минуты назад'
     }
-    // Для временных промежутков более одной минуты можете использовать formatDistanceToNow
+    // Для временных промежутков более одной минуты
     return formatDistanceToNow(date, { addSuffix: true, locale: ru })
+  }
+
+  static formatTimerTime = (totalSeconds) => {
+    const minutes = Math.floor(totalSeconds / 60)
+      .toString()
+      .padStart(2, '0')
+    const seconds = (totalSeconds - minutes * 60).toString().padStart(2, '0')
+    return `${minutes}:${seconds}`
   }
 
   constructor(props) {
@@ -31,6 +39,18 @@ export default class Task extends Component {
     this.state = {
       isEditing: false,
     }
+  }
+
+  startTimer = (event) => {
+    event.stopPropagation()
+    const { id, startTimer } = this.props
+    startTimer(id)
+  }
+
+  pauseTimer = (event) => {
+    event.stopPropagation()
+    const { id, pauseTimer } = this.props
+    pauseTimer(id)
   }
 
   handleKeyDown = (event) => {
@@ -41,9 +61,13 @@ export default class Task extends Component {
     }
   }
 
-  onItemClick = () => {
-    const { onToggleLeft, id } = this.props
+  onItemClick = (event) => {
+    event.stopPropagation()
+    const { onToggleLeft, id, completed, timers } = this.props
     onToggleLeft(id)
+    if (completed && timers[id].timerId) {
+      this.pauseTimer(event)
+    }
   }
 
   toggleEdit = () => {
@@ -59,8 +83,11 @@ export default class Task extends Component {
   }
 
   render() {
-    const { description, created, onDeleted, onToggleLeft, completed } = this.props
+    const { description, created, onDeleted, onToggleLeft, completed, timers, id } = this.props
     const { isEditing } = this.state
+
+    // Используем remainingTime из props
+    const remainingTime = timers && timers[id] ? timers[id].remainingTime : 0
 
     // Форматирование даты создания задания
     const timeAgo = Task.formatTimeAgo(created)
@@ -76,16 +103,17 @@ export default class Task extends Component {
           <input className="toggle" type="checkbox" checked={completed} onClick={this.onItemClick} readOnly />
 
           {isEditing ? (
-            <input
-              className="inputEdit"
-              autoFocus
-              type="text"
-              defaultValue={description}
-              onKeyDown={this.handleKeyDown}
-            />
+            <input className="edit" autoFocus type="text" defaultValue={description} onKeyDown={this.handleKeyDown} />
           ) : (
             <label onClick={onToggleLeft}>
-              <span className="description">{description}</span>
+              <span className="title">{description}</span>
+              <span className="description">
+                <div>
+                  <button className="icon icon-play" onClick={this.startTimer} />
+                  <button className="icon icon-pause" onClick={this.pauseTimer} />
+                  {Task.formatTimerTime(remainingTime)}
+                </div>
+              </span>
               <span className="created">{timeAgo}</span>
             </label>
           )}
@@ -103,7 +131,7 @@ export default class Task extends Component {
 }
 
 Task.propTypes = {
-  id: PropTypes.number.isRequired,
+  id: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   created: PropTypes.instanceOf(Date).isRequired,
   onDeleted: PropTypes.func.isRequired,

@@ -3,7 +3,15 @@ import PropTypes from 'prop-types'
 import Task from '../Task'
 import './TaskList.css'
 
-export default function TaskList({ tasks, onDeleted, onToggleLeft, onSaveTaskDescription }) {
+export default function TaskList({
+  tasks,
+  onDeleted,
+  onToggleLeft,
+  onSaveTaskDescription,
+  startTimer,
+  pauseTimer,
+  timers,
+}) {
   return (
     <ul className="todo-list">
       {tasks.map((task) => (
@@ -13,9 +21,13 @@ export default function TaskList({ tasks, onDeleted, onToggleLeft, onSaveTaskDes
           description={task.description}
           created={task.created}
           completed={task.completed}
+          timer={task.timer}
           onDeleted={() => onDeleted(task.id)}
           onToggleLeft={() => onToggleLeft(task.id)}
           onSaveTaskDescription={onSaveTaskDescription}
+          startTimer={startTimer}
+          pauseTimer={pauseTimer}
+          timers={timers}
         />
       ))}
     </ul>
@@ -31,7 +43,7 @@ TaskList.defaultProps = {
 TaskList.propTypes = {
   tasks: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number,
+      id: PropTypes.string,
       description: PropTypes.string,
       created: PropTypes.instanceOf(Date),
       completed: PropTypes.bool,
