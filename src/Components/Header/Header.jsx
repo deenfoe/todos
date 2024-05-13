@@ -7,7 +7,7 @@ import NewTaskForm from '../NewTaskForm'
 export default function Header({ addItem }) {
   return (
     <header className="header">
-      <h1>todos</h1>
+      <h1>Todo timer</h1>
       <NewTaskForm onItemAdded={addItem} />
     </header>
   )
