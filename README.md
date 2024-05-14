@@ -1,2 +1,2 @@
-todo: https://class-todos.vercel.app/ 
-todo timer: https://todos-tau-three.vercel.app/
+### todo с таймером: https://todos-tau-three.vercel.app/
+### обычный todo: https://class-todos.vercel.app/ 
